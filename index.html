@@ -38,7 +38,7 @@ body::before{
 .topbar{
   grid-column:1/-1;
   background:var(--s1);border-bottom:1px solid var(--b2);
-  display:flex;align-items:center;padding:0 20px 0 0;
+  display:flex;align-items:center;padding:0 16px 0 0;
   position:sticky;top:0;z-index:200;
   box-shadow:0 1px 0 rgba(255,255,255,.04);
 }
@@ -57,12 +57,23 @@ body::before{
 .brand-icon svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 .brand-name{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:.06em;}
 .brand-v{font-size:10px;color:var(--t3);font-family:var(--mono);background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:1px 6px;margin-left:4px;}
-.topbar-title{flex:1;padding:0 20px;font-size:13px;color:var(--t3);font-family:var(--mono);}
-.topbar-links{display:flex;align-items:center;gap:8px;}
-.topbar-links a{font-size:12.5px;color:var(--t2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:all .13s;}
+.topbar-title{flex:1;padding:0 16px;font-size:12px;color:var(--t3);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.topbar-links{display:flex;align-items:center;gap:6px;}
+.topbar-links a{font-size:12px;color:var(--t2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:all .13s;}
 .topbar-links a:hover{color:var(--t1);background:var(--s3);}
 .topbar-links .gh{background:var(--s3);border:1px solid var(--b2);color:var(--t1);padding:5px 12px;font-size:12px;}
 .topbar-links .gh:hover{border-color:var(--accent);color:var(--accent);}
+
+/* Mobile menu button */
+.menu-btn{
+  display:none;
+  background:var(--s3);border:1px solid var(--b2);border-radius:7px;
+  width:34px;height:34px;align-items:center;justify-content:center;
+  cursor:pointer;margin-right:8px;flex-shrink:0;
+  transition:all .13s;
+}
+.menu-btn:hover{border-color:var(--accent);}
+.menu-btn svg{width:16px;height:16px;stroke:var(--t2);fill:none;stroke-width:2;stroke-linecap:round;}
 
 /* ── Sidebar ── */
 .sidebar{
@@ -92,6 +103,14 @@ body::before{
 .sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--b1);font-size:11px;color:var(--t3);font-family:var(--mono);line-height:2;}
 .sidebar-footer a{color:var(--t3);text-decoration:none;transition:color .13s;}
 .sidebar-footer a:hover{color:var(--accent);}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:150;
+  backdrop-filter:blur(4px);
+}
+.sidebar-overlay.on{display:block;}
 
 /* ── Content ── */
 .content{overflow-y:auto;height:calc(100vh - var(--th));}
@@ -131,12 +150,13 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
 .copy-btn.ok{background:var(--success);color:var(--bg);border-color:transparent;}
 
 /* ── Tables ── */
-.tbl{width:100%;border-collapse:collapse;margin:10px 0 22px;font-size:13px;}
+.tbl-wrap{overflow-x:auto;margin:10px 0 22px;-webkit-overflow-scrolling:touch;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
 .tbl th{
   background:var(--s2);color:var(--t2);font-weight:600;
   font-size:11px;letter-spacing:.06em;text-transform:uppercase;
   padding:10px 14px;text-align:left;border-bottom:1px solid var(--b3);
-  font-family:var(--mono);
+  font-family:var(--mono);white-space:nowrap;
 }
 .tbl td{padding:10px 14px;border-bottom:1px solid var(--b1);color:var(--t2);vertical-align:top;line-height:1.6;}
 .tbl tr:last-child td{border-bottom:none;}
@@ -196,13 +216,86 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--b3);border-radius:3px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — MOBILE & TABLET
+═══════════════════════════════════════════ */
+
+/* Tablet — shrink sidebar */
+@media(max-width:900px){
+  :root{--sw:200px;}
+  .topbar-links a:not(.gh){display:none;}
+  .page{padding:24px 24px 60px;}
+}
+
+/* Mobile — full overlay sidebar */
+@media(max-width:640px){
+  :root{--th:48px;}
+
+  /* Switch to single column */
+  .layout{grid-template-columns:1fr;grid-template-rows:var(--th) 1fr;}
+
+  /* Show hamburger, hide brand border */
+  .menu-btn{display:flex;}
+  .brand{border-right:none;width:auto;padding:0 12px 0 4px;}
+  .brand-v{display:none;}
+  .topbar-title{display:none;}
+  .topbar-links .gh{font-size:11px;padding:4px 9px;}
+
+  /* Sidebar becomes a fixed overlay panel */
+  .sidebar{
+    position:fixed;
+    top:0;left:0;
+    width:280px;max-width:85vw;
+    height:100vh;
+    z-index:160;
+    transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+    border-right:1px solid var(--b2);
+    box-shadow:8px 0 32px rgba(0,0,0,.4);
+  }
+  .sidebar.open{transform:translateX(0);}
+
+  /* Content fills full width */
+  .content{height:calc(100vh - var(--th));width:100%;}
+  .page{padding:20px 16px 72px;max-width:100%;}
+  .pg-title{font-size:18px;}
+  .pg-sub{font-size:13px;}
+
+  /* Feature grid → single col on small screens */
+  .fgrid{grid-template-columns:1fr;}
+
+  /* Code blocks — smaller font on mobile */
+  pre code{font-size:11.5px;}
+  code{font-size:11.5px;}
+
+  /* Copy button repositioning on mobile */
+  .copy-btn{font-size:10px;padding:2px 8px;top:8px;right:8px;}
+
+  /* Steps — tighter on mobile */
+  .step{gap:10px;}
+  .step-body h4{font-size:13px;}
+
+  h2{font-size:14px;margin:24px 0 10px;}
+}
+
+/* Very small screens */
+@media(max-width:380px){
+  .page{padding:16px 12px 64px;}
+  .pg-title{font-size:16px;}
+}
 </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
 <div class="layout">
 
 <!-- Topbar -->
 <header class="topbar">
+  <button class="menu-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Toggle menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
   <div class="brand">
     <div class="brand-icon">
       <svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
@@ -219,7 +312,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
 </header>
 
 <!-- Sidebar -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <nav>
     <div class="nav-group">
       <div class="nav-label">Getting Started</div>
@@ -236,7 +329,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
         Quick Start
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">Configuration</div>
       <div class="nav-item" onclick="go('providers','/ ai providers')">
@@ -248,7 +340,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
         Environment Variables
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">Usage</div>
       <div class="nav-item" onclick="go('reports','/ report types')">
@@ -268,7 +359,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
         Export &amp; PDF
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">Team</div>
       <div class="nav-item" onclick="go('deploy','/ deployment')">
@@ -280,7 +370,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
         User Management
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">Extend</div>
       <div class="nav-item" onclick="go('addprov','/ adding a provider')">
@@ -288,7 +377,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
         Adding a Provider
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">Reference</div>
       <div class="nav-item" onclick="go('screenshots','/ screenshots')">
@@ -320,10 +408,8 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
     <div class="pg-title">Introduction</div>
     <div class="pg-sub">VAJRA — Vulnerability Analysis, Judgement &amp; Reporting Arsenal</div>
   </div>
-
   <p>VAJRA is a locally-hosted AI report generator for security professionals. It transforms your raw pentest findings into complete, professional reports — aligned with CREST, PTES, OWASP, and NIST standards — using any AI provider you configure.</p>
   <p>Everything runs on your machine. Your findings and client data never leave your network except to the AI endpoint you explicitly configure.</p>
-
   <h2>Features</h2>
   <div class="fgrid">
     <div class="fcard"><strong>3 Report Types</strong><span>Penetration Test, Red Team Engagement, Phishing Campaign</span></div>
@@ -335,7 +421,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
     <div class="fcard"><strong>Custom Templates</strong><span>Upload your own branded .docx or .md templates</span></div>
     <div class="fcard"><strong>Large Assessments</strong><span>Parallel chunked generation for 10+ findings without timeouts</span></div>
   </div>
-
   <h2>Report Standards</h2>
   <p>Every generated report is structured to meet professional security assessment standards:</p>
   <ul>
@@ -346,8 +431,8 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
     <li><strong>CVSS v3.1</strong> — Common Vulnerability Scoring System</li>
     <li><strong>MITRE ATT&amp;CK</strong> — adversarial tactics and techniques (Red Team)</li>
   </ul>
-
   <h2>Supported AI Providers</h2>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Provider</th><th>AI_PROVIDER=</th><th>Free Tier</th><th>Extra Install</th></tr>
     <tr><td>Anthropic Claude</td><td><code>anthropic</code></td><td><span class="badge badge-no">No</span></td><td><span class="badge badge-yes">None</span></td></tr>
@@ -361,6 +446,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
     <tr><td>Ollama (local)</td><td><code>ollama</code></td><td><span class="badge badge-yes">Completely free</span></td><td><span class="badge badge-yes">None</span></td></tr>
     <tr><td>DeepSeek</td><td><code>deepseek</code></td><td><span class="badge badge-yes">Yes</span></td><td><span class="badge badge-yes">None</span></td></tr>
   </table>
+  </div>
 </div>
 
 <!-- INSTALLATION -->
@@ -369,21 +455,20 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
     <div class="pg-title">Installation</div>
     <div class="pg-sub">Get VAJRA running on Mac or Linux in under 5 minutes.</div>
   </div>
-
   <h2>Requirements</h2>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Requirement</th><th>Minimum Version</th><th>Check Command</th></tr>
     <tr><td>Python</td><td>3.10+</td><td><code>python3 --version</code></td></tr>
     <tr><td>Node.js</td><td>18+</td><td><code>node --version</code></td></tr>
     <tr><td>pip</td><td>any</td><td><code>pip3 --version</code></td></tr>
   </table>
-
+  </div>
   <h2>Quick Install (recommended)</h2>
   <p>The setup script handles everything — dependencies, config, and directories.</p>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>git clone https://github.com/Mah3Sec/VAJRA.git
 cd VAJRA
 bash setup.sh</code></pre>
-
   <p>What the setup script does:</p>
   <ul>
     <li>Verifies Python and Node.js are installed</li>
@@ -392,29 +477,19 @@ bash setup.sh</code></pre>
     <li>Copies <code>.env.example</code> → <code>.env</code></li>
     <li>Creates <code>reports/</code>, <code>database/</code>, <code>ui/static/logos/</code> directories</li>
   </ul>
-
   <h2>Manual Install</h2>
-  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code># Python dependencies
-pip3 install -r requirements.txt --break-system-packages
-
-# Node.js dependencies (for DOCX builder)
+  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>pip3 install -r requirements.txt --break-system-packages
 cd docx_builder && npm install && cd ..
-
-# Config file
 cp .env.example .env
-nano .env   # add your AI_API_KEY and AI_PROVIDER
-
-# Runtime directories
+nano .env
 mkdir -p reports database ui/static/logos</code></pre>
-
   <h2>First Run</h2>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>python3 app.py</code></pre>
   <p>Open <a href="http://localhost:5000" target="_blank">http://localhost:5000</a> in your browser.</p>
   <div class="callout callout-warn">
     <strong>Default credentials:</strong> username <code>admin</code> / password <code>vajra-admin-2026</code><br>
-    Change the admin password immediately after first login — Settings → Profile.
+    Change the admin password immediately after first login.
   </div>
-
   <h2>Docker</h2>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>docker build -t vajra .
 docker run -p 5000:5000 --env-file .env vajra</code></pre>
@@ -426,57 +501,50 @@ docker run -p 5000:5000 --env-file .env vajra</code></pre>
     <div class="pg-title">Quick Start</div>
     <div class="pg-sub">Generate your first professional report in 5 steps.</div>
   </div>
-
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-body">
         <h4>Configure your AI provider</h4>
-        <p>Edit <code>.env</code> and set your provider, API key, and model. Example for Anthropic:</p>
+        <p>Edit <code>.env</code> and set your provider, API key, and model:</p>
         <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=anthropic
 AI_API_KEY=sk-ant-your-key-here
 AI_BASE_URL=https://api.anthropic.com
 AI_MODEL=claude-sonnet-4-6</code></pre>
-        <p>See <strong>AI Providers</strong> for configuration examples for every supported provider.</p>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
         <h4>Start VAJRA</h4>
         <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>python3 app.py</code></pre>
-        <p>Open <a href="http://localhost:5000">http://localhost:5000</a> and log in with your admin credentials.</p>
+        <p>Open <a href="http://localhost:5000">http://localhost:5000</a> and log in.</p>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
         <h4>Select report type and fill engagement details</h4>
-        <p>Choose between Penetration Test, Red Team, or Phishing Campaign. Fill in client name, lead assessor, scope, date, and any type-specific fields.</p>
+        <p>Choose Penetration Test, Red Team, or Phishing Campaign. Fill in client name, assessor, scope, and date.</p>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-body">
         <h4>Add your findings</h4>
-        <p>Three methods available — paste raw notes, fill the structured form, or upload a scanner export file (Nessus, Burp Suite, Nmap XML).</p>
+        <p>Paste raw notes, fill the structured form, or upload a scanner export (Nessus, Burp Suite, Nmap XML).</p>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-body">
         <h4>Generate and export</h4>
-        <p>Click <strong>Generate Report</strong>. The AI builds the full report. Export as DOCX, PDF, or Markdown when done.</p>
+        <p>Click <strong>Generate Report</strong>. Export as DOCX, PDF, or Markdown when done.</p>
       </div>
     </div>
   </div>
-
   <div class="callout callout-info">
-    <strong>Large assessments:</strong> For 10+ findings, VAJRA automatically switches to parallel chunked generation. A real-time progress bar tracks each batch — no gateway timeouts.
+    <strong>Large assessments:</strong> For 10+ findings, VAJRA automatically switches to parallel chunked generation with a real-time progress bar.
   </div>
 </div>
 
@@ -484,22 +552,19 @@ AI_MODEL=claude-sonnet-4-6</code></pre>
 <div class="page" id="p-providers">
   <div class="pg-head">
     <div class="pg-title">AI Providers</div>
-    <div class="pg-sub">VAJRA supports any Anthropic-compatible or OpenAI-compatible API. No extra packages needed for most providers.</div>
+    <div class="pg-sub">VAJRA supports any Anthropic-compatible or OpenAI-compatible API.</div>
   </div>
-
-  <h2>How it works</h2>
-  <p>Set three environment variables in <code>.env</code> and VAJRA connects to your chosen provider automatically. The provider router uses raw <code>httpx</code> HTTP calls — no additional SDK packages required except for Google Gemini.</p>
-
   <h2>Environment Variables</h2>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
-    <tr><td><code>AI_PROVIDER</code></td><td>Yes</td><td>Provider name — see options below</td></tr>
-    <tr><td><code>AI_API_KEY</code></td><td>Yes</td><td>Your API key or authentication token</td></tr>
-    <tr><td><code>AI_BASE_URL</code></td><td>Sometimes</td><td>Base URL — optional for providers with a built-in default</td></tr>
-    <tr><td><code>AI_MODEL</code></td><td>Yes</td><td>Model name or ID</td></tr>
-    <tr><td><code>SKIP_SSL_VERIFY</code></td><td>No</td><td>Set <code>true</code> when using self-signed TLS certificates</td></tr>
+    <tr><td><code>AI_PROVIDER</code></td><td>Yes</td><td>Provider name</td></tr>
+    <tr><td><code>AI_API_KEY</code></td><td>Yes</td><td>Your API key</td></tr>
+    <tr><td><code>AI_BASE_URL</code></td><td>Sometimes</td><td>Base URL override</td></tr>
+    <tr><td><code>AI_MODEL</code></td><td>Yes</td><td>Model name</td></tr>
+    <tr><td><code>SKIP_SSL_VERIFY</code></td><td>No</td><td>Disable TLS for self-signed certs</td></tr>
   </table>
-
+  </div>
   <h2>Anthropic (Claude)</h2>
   <div class="pcard">
     <p class="pmeta">Models: claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5 · <a href="https://console.anthropic.com" target="_blank">Get API key →</a></p>
@@ -508,85 +573,66 @@ AI_API_KEY=sk-ant-your-key-here
 AI_BASE_URL=https://api.anthropic.com
 AI_MODEL=claude-sonnet-4-6</code></pre>
   </div>
-
   <h2>OpenAI (ChatGPT)</h2>
   <div class="pcard">
-    <p class="pmeta">Models: gpt-4o, gpt-4o-mini, gpt-4-turbo · <a href="https://platform.openai.com" target="_blank">Get API key →</a></p>
+    <p class="pmeta">Models: gpt-4o, gpt-4o-mini · <a href="https://platform.openai.com" target="_blank">Get API key →</a></p>
     <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=openai
 AI_API_KEY=sk-your-key
 AI_MODEL=gpt-4o</code></pre>
   </div>
-
   <h2>Google Gemini</h2>
   <div class="pcard">
-    <p class="pmeta">Models: gemini-1.5-pro, gemini-1.5-flash, gemini-2.0-flash · <a href="https://aistudio.google.com" target="_blank">Get API key →</a> · Requires one extra package</p>
+    <p class="pmeta">Models: gemini-1.5-pro, gemini-2.0-flash · <a href="https://aistudio.google.com" target="_blank">Get API key →</a> · Requires one extra package</p>
     <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>pip3 install google-generativeai --break-system-packages</code></pre>
     <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=gemini
 AI_API_KEY=AIza-your-key
 AI_MODEL=gemini-1.5-pro</code></pre>
   </div>
-
-  <h2>xAI Grok</h2>
+  <h2>Groq — Fast &amp; Free</h2>
   <div class="pcard">
-    <p class="pmeta">Models: grok-2, grok-2-mini · <a href="https://console.x.ai" target="_blank">Get API key →</a></p>
-    <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=grok
-AI_API_KEY=xai-your-key
-AI_MODEL=grok-2</code></pre>
-  </div>
-
-  <h2>Groq</h2>
-  <div class="pcard">
-    <p class="pmeta">Models: llama-3.3-70b-versatile, mixtral-8x7b-32768 · <a href="https://console.groq.com" target="_blank">Get API key →</a> · Free tier available</p>
+    <p class="pmeta">Models: llama-3.3-70b-versatile · <a href="https://console.groq.com" target="_blank">Get API key →</a> · Free tier available</p>
     <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=groq
 AI_API_KEY=gsk_your-key
 AI_MODEL=llama-3.3-70b-versatile</code></pre>
   </div>
-
   <h2>Ollama — Local &amp; Completely Free</h2>
   <div class="pcard">
-    <p class="pmeta">Runs entirely on your machine. No API key, no cost, no data sent externally. · <a href="https://ollama.com" target="_blank">Install Ollama →</a></p>
-    <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code># Install Ollama, then pull a model
-brew install ollama          # macOS
-curl -fsSL https://ollama.com/install.sh | sh  # Linux
-ollama pull llama3.1:70b</code></pre>
+    <p class="pmeta">Runs entirely on your machine. No API key, no cost. · <a href="https://ollama.com" target="_blank">Install Ollama →</a></p>
+    <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>ollama pull llama3.1:70b</code></pre>
     <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=ollama
 AI_API_KEY=not-required
 AI_BASE_URL=http://localhost:11434/v1
 AI_MODEL=llama3.1:70b</code></pre>
   </div>
-
-  <h2>Mistral AI</h2>
-  <div class="pcard">
-    <p class="pmeta">Models: mistral-large-latest, codestral-latest · <a href="https://console.mistral.ai" target="_blank">Get API key →</a></p>
-    <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=mistral
-AI_API_KEY=your-key
-AI_MODEL=mistral-large-latest</code></pre>
-  </div>
-
   <h2>OpenRouter</h2>
   <div class="pcard">
-    <p class="pmeta">Access 200+ models from any provider with a single API key · <a href="https://openrouter.ai" target="_blank">Get API key →</a></p>
+    <p class="pmeta">200+ models with a single API key · <a href="https://openrouter.ai" target="_blank">Get API key →</a></p>
     <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=openrouter
 AI_API_KEY=sk-or-your-key
 AI_MODEL=anthropic/claude-3.5-sonnet</code></pre>
   </div>
-
+  <h2>xAI Grok</h2>
+  <div class="pcard">
+    <p class="pmeta">Models: grok-2 · <a href="https://console.x.ai" target="_blank">Get API key →</a></p>
+    <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=grok
+AI_API_KEY=xai-your-key
+AI_MODEL=grok-2</code></pre>
+  </div>
   <h2>DeepSeek</h2>
   <div class="pcard">
-    <p class="pmeta">Models: deepseek-chat, deepseek-coder · <a href="https://platform.deepseek.com" target="_blank">Get API key →</a></p>
+    <p class="pmeta">Models: deepseek-chat · <a href="https://platform.deepseek.com" target="_blank">Get API key →</a></p>
     <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=deepseek
 AI_API_KEY=your-key
 AI_MODEL=deepseek-chat</code></pre>
   </div>
-
   <h2>Self-hosted Proxy</h2>
   <div class="pcard">
     <p class="pmeta">LiteLLM, vLLM, Azure OpenAI, or any OpenAI-compatible gateway</p>
-    <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=openai        # or anthropic — match your proxy's wire format
+    <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=openai
 AI_API_KEY=your-proxy-token
 AI_BASE_URL=https://your-gateway.example.com/v1
 AI_MODEL=your-model-name
-SKIP_SSL_VERIFY=true      # only if using a self-signed TLS certificate</code></pre>
+SKIP_SSL_VERIFY=true</code></pre>
   </div>
 </div>
 
@@ -594,113 +640,102 @@ SKIP_SSL_VERIFY=true      # only if using a self-signed TLS certificate</code></
 <div class="page" id="p-env">
   <div class="pg-head">
     <div class="pg-title">Environment Variables</div>
-    <div class="pg-sub">All VAJRA configuration is done via the <code>.env</code> file in the project root. Copy <code>.env.example</code> to get started.</div>
+    <div class="pg-sub">All configuration via <code>.env</code> in the project root.</div>
   </div>
-
-  <h2>Full Reference</h2>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
-    <tr><td><code>AI_PROVIDER</code></td><td><code>anthropic</code></td><td>AI provider — anthropic, openai, gemini, grok, groq, mistral, ollama, openrouter, deepseek, together</td></tr>
-    <tr><td><code>AI_API_KEY</code></td><td>—</td><td>API key or token for the provider (required)</td></tr>
-    <tr><td><code>AI_BASE_URL</code></td><td>Provider default</td><td>Override the base URL — use for proxies or custom endpoints</td></tr>
+    <tr><td><code>AI_PROVIDER</code></td><td><code>anthropic</code></td><td>AI provider name</td></tr>
+    <tr><td><code>AI_API_KEY</code></td><td>—</td><td>API key (required)</td></tr>
+    <tr><td><code>AI_BASE_URL</code></td><td>Provider default</td><td>Override base URL for proxies</td></tr>
     <tr><td><code>AI_MODEL</code></td><td><code>claude-sonnet-4-6</code></td><td>Model name or ID</td></tr>
-    <tr><td><code>SKIP_SSL_VERIFY</code></td><td><code>false</code></td><td>Disable TLS certificate verification — for self-signed certs only</td></tr>
-    <tr><td><code>SECRET_KEY</code></td><td>random (unstable)</td><td>Flask session secret — <strong>always set this for production</strong></td></tr>
-    <tr><td><code>ADMIN_PASSWORD</code></td><td><code>vajra-admin-2026</code></td><td>Admin account password — synced on every restart if set</td></tr>
+    <tr><td><code>SKIP_SSL_VERIFY</code></td><td><code>false</code></td><td>Disable TLS verification</td></tr>
+    <tr><td><code>SECRET_KEY</code></td><td>random</td><td>Flask session secret — always set for production</td></tr>
+    <tr><td><code>ADMIN_PASSWORD</code></td><td><code>vajra-admin-2026</code></td><td>Admin password — synced on restart</td></tr>
     <tr><td><code>HOST</code></td><td><code>0.0.0.0</code></td><td>Server bind address</td></tr>
-    <tr><td><code>PORT</code></td><td><code>5000</code></td><td>Server listen port</td></tr>
-    <tr><td><code>HTTPS</code></td><td><code>false</code></td><td>Set <code>true</code> when behind HTTPS to enable Secure cookie flag</td></tr>
+    <tr><td><code>PORT</code></td><td><code>5000</code></td><td>Listen port</td></tr>
+    <tr><td><code>HTTPS</code></td><td><code>false</code></td><td>Enable Secure cookie flag</td></tr>
   </table>
-
-  <div class="callout callout-warn">
-    <strong>Never commit <code>.env</code> to version control.</strong> It contains your API key. The <code>.gitignore</code> already excludes it, but double-check before pushing.
   </div>
-
+  <div class="callout callout-warn">
+    <strong>Never commit <code>.env</code> to version control.</strong> It contains your API key.
+  </div>
   <h2>Generate a SECRET_KEY</h2>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>python3 -c "import secrets; print(secrets.token_hex(32))"</code></pre>
-  <p>Paste the output as your <code>SECRET_KEY</code> value. Without this set, sessions will reset every time the server restarts.</p>
 </div>
 
 <!-- REPORT TYPES -->
 <div class="page" id="p-reports">
   <div class="pg-head">
     <div class="pg-title">Report Types</div>
-    <div class="pg-sub">VAJRA generates three types of professional security assessment reports.</div>
+    <div class="pg-sub">Three types of professional security assessment reports.</div>
   </div>
-
   <h2>Penetration Test Report</h2>
-  <p>The standard pentest report type. Follows CREST / PTES / OWASP WSTG v4.2 / NIST SP 800-115 methodology. Uses CVSS v3.1 scoring with calculated remediation deadlines (Critical+2d, High+7d, Medium+30d, Low+90d).</p>
+  <p>CREST / PTES / OWASP WSTG v4.2 / NIST SP 800-115. CVSS v3.1 scoring with calculated deadlines.</p>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Section</th><th>Contents</th></tr>
-    <tr><td>Executive Summary</td><td>Board-level overview, overall risk rating, findings count by severity, most critical action</td></tr>
-    <tr><td>Engagement Overview</td><td>Scope, methodology phases, CVSS risk rating table, assessment limitations</td></tr>
-    <tr><td>Findings Summary</td><td>Full vulnerability table with CVSS scores, severity distribution breakdown</td></tr>
-    <tr><td>Detailed Findings</td><td>Per finding: CVSS v3.1, CWE, OWASP Top 10 mapping, steps to reproduce, evidence, business impact, remediation steps</td></tr>
-    <tr><td>Remediation Roadmap</td><td>Prioritised schedule with calculated calendar deadlines per finding</td></tr>
-    <tr><td>Appendix</td><td>Tools used, regulatory mapping (PCI DSS, GDPR, ISO 27001), legal disclaimer, references</td></tr>
+    <tr><td>Executive Summary</td><td>Board-level overview, risk rating, findings count by severity</td></tr>
+    <tr><td>Engagement Overview</td><td>Scope, methodology phases, CVSS rating table, limitations</td></tr>
+    <tr><td>Findings Summary</td><td>Full vulnerability table with CVSS scores, severity distribution</td></tr>
+    <tr><td>Detailed Findings</td><td>CVSS v3.1, CWE, OWASP Top 10, steps to reproduce, evidence, remediation</td></tr>
+    <tr><td>Remediation Roadmap</td><td>Prioritised schedule with calendar deadlines per finding</td></tr>
+    <tr><td>Appendix</td><td>Tools used, regulatory mapping, legal disclaimer</td></tr>
   </table>
-
+  </div>
   <h2>Red Team Engagement Report</h2>
-  <p>For full adversary simulation engagements. Follows CREST STAR / CBEST / TIBER-EU standards. Includes MITRE ATT&amp;CK TTP mapping and blue team detection assessment.</p>
+  <p>CREST STAR / CBEST / TIBER-EU with MITRE ATT&amp;CK TTP mapping and blue team assessment.</p>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Section</th><th>Contents</th></tr>
-    <tr><td>Executive Summary</td><td>Objective outcome, whether crown jewels were reached, detection rate, dwell time</td></tr>
-    <tr><td>Engagement Overview</td><td>Objective, threat actor profile simulated, scope, methodology phases</td></tr>
-    <tr><td>Attack Narrative</td><td>Full chronological kill chain with timestamps, techniques, and pivots</td></tr>
-    <tr><td>TTP Observations</td><td>Per-TTP blocks with MITRE ATT&amp;CK mapping, evidence, detection gaps, recommendations</td></tr>
-    <tr><td>MITRE ATT&amp;CK Mapping</td><td>Full table of tactics, techniques, and tools used across the engagement</td></tr>
-    <tr><td>Blue Team Assessment</td><td>Detection timeline per phase, what was missed, SIEM rule and log source recommendations</td></tr>
+    <tr><td>Executive Summary</td><td>Objective outcome, crown jewel status, detection rate, dwell time</td></tr>
+    <tr><td>Attack Narrative</td><td>Chronological kill chain with timestamps, techniques, pivots</td></tr>
+    <tr><td>TTP Observations</td><td>MITRE ATT&amp;CK mapping, evidence, detection gaps, recommendations</td></tr>
+    <tr><td>Blue Team Assessment</td><td>Detection timeline, SIEM rule recommendations</td></tr>
   </table>
-
+  </div>
   <h2>Phishing Campaign Report</h2>
-  <p>For simulated phishing awareness exercises. Constructive, educational tone — not an offensive attack report. Follows NIST / SANS / CREST standards.</p>
+  <p>NIST / SANS / CREST. Constructive educational tone with Resilience Score calculation.</p>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Section</th><th>Contents</th></tr>
-    <tr><td>Executive Summary</td><td>Overall susceptibility rate, key behavioural finding, recommended action</td></tr>
-    <tr><td>Campaign Metrics</td><td>Emails sent, delivered, opened, clicked, credentials submitted, MFA bypassed, reported by staff</td></tr>
-    <tr><td>Department Breakdown</td><td>Per-department click and submission rates with risk level</td></tr>
-    <tr><td>Email Security Controls</td><td>SPF, DKIM, DMARC configuration and effectiveness assessment</td></tr>
-    <tr><td>Phishing Resilience Score</td><td>Calculated score (non-click rate × 0.4 + report rate × 0.6) with benchmark comparison</td></tr>
-    <tr><td>Recommendations</td><td>Targeted training by risk group, technical controls, awareness programme cadence</td></tr>
+    <tr><td>Campaign Metrics</td><td>Sent, clicked, credentials submitted, MFA bypassed, reported</td></tr>
+    <tr><td>Department Breakdown</td><td>Per-department click and submission rates</td></tr>
+    <tr><td>Resilience Score</td><td>Calculated score with benchmark comparison</td></tr>
+    <tr><td>Recommendations</td><td>Targeted training, technical controls, awareness programme</td></tr>
   </table>
+  </div>
 </div>
 
 <!-- FINDINGS -->
 <div class="page" id="p-findings">
   <div class="pg-head">
     <div class="pg-title">Adding Findings</div>
-    <div class="pg-sub">Three methods to get your findings into VAJRA. Mix and match as needed.</div>
+    <div class="pg-sub">Three methods to get findings into VAJRA.</div>
   </div>
-
   <h2>Method 1 — Paste Raw Notes</h2>
-  <p>The fastest method. Dump your raw assessment notes directly into the findings box — no formatting required. VAJRA's AI structures everything into proper finding blocks with CVSS, CWE, remediation, and all required sections.</p>
+  <p>Dump your raw notes directly. VAJRA structures everything into proper findings with CVSS, CWE, and remediation.</p>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>SQL injection on /api/login — high severity
-The username parameter is vulnerable to blind boolean-based SQLi.
-Confirmed with sqlmap: extracted database credentials.
-Database: MySQL 8.0, running as root.
+Confirmed with sqlmap. Database: MySQL 8.0, running as root.
 
 Reflected XSS in search — medium
-Parameter: q
-Payload: &lt;script&gt;alert(document.cookie)&lt;/script&gt;
-Tested on Chrome 121, no CSP headers present.
+Parameter: q — no CSP headers present.
 
 Missing security headers — low
-No X-Frame-Options, X-Content-Type-Options, or Content-Security-Policy headers.</code></pre>
-
+No X-Frame-Options or Content-Security-Policy.</code></pre>
   <h2>Method 2 — Manual Structured Form</h2>
-  <p>Fill each finding individually using structured input fields: title, severity (Critical/High/Medium/Low/Info), description, steps to reproduce, business impact, remediation, CVSS score, and references. Best for precise control over each finding's content and for ensuring complete data before generation.</p>
-
+  <p>Fill each finding individually: title, severity, description, steps to reproduce, business impact, remediation, CVSS score, and references.</p>
   <h2>Method 3 — Tool Import</h2>
-  <p>Upload an export file directly from your scanning tool. VAJRA auto-detects the format, parses all findings, and converts them to structured text ready for AI generation.</p>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Tool</th><th>File Format</th><th>How to Export</th></tr>
-    <tr><td>Nessus</td><td><code>.nessus</code></td><td>Scans → select scan → Export → Nessus format</td></tr>
-    <tr><td>Burp Suite Pro</td><td><code>.xml</code></td><td>Issue activity → Report → XML → Export</td></tr>
-    <tr><td>Nmap</td><td><code>.xml</code></td><td>Run with <code>nmap -oX output.xml [target]</code></td></tr>
+    <tr><td>Nessus</td><td><code>.nessus</code></td><td>Scans → Export → Nessus format</td></tr>
+    <tr><td>Burp Suite Pro</td><td><code>.xml</code></td><td>Issue activity → Report → XML</td></tr>
+    <tr><td>Nmap</td><td><code>.xml</code></td><td><code>nmap -oX output.xml [target]</code></td></tr>
   </table>
-
+  </div>
   <div class="callout callout-info">
-    <strong>Large assessments (10+ findings):</strong> VAJRA automatically detects the finding count and switches to parallel chunked generation. A progress bar tracks each batch completing in real time. No gateway timeouts.
+    <strong>10+ findings:</strong> VAJRA switches to parallel chunked generation automatically. Real-time progress bar, no timeouts.
   </div>
 </div>
 
@@ -708,41 +743,30 @@ No X-Frame-Options, X-Content-Type-Options, or Content-Security-Policy headers.<
 <div class="page" id="p-templates">
   <div class="pg-head">
     <div class="pg-title">Custom Templates</div>
-    <div class="pg-sub">Use your own branded report template. VAJRA fills it with AI-generated content.</div>
+    <div class="pg-sub">Use your own branded report template.</div>
   </div>
-
-  <h2>Supported Formats</h2>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Format</th><th>How it works</th><th>Best for</th></tr>
-    <tr><td><code>.docx</code></td><td>VAJRA's template filler replaces placeholder tokens and injects AI content into your real Word document, preserving your branding, fonts, and styles</td><td>Branded client reports with your company's visual identity</td></tr>
-    <tr><td><code>.md</code></td><td>The AI reads your full Markdown template and follows its section structure exactly, replacing placeholders and filling content blocks</td><td>Consistent report structure across assessments</td></tr>
+    <tr><td><code>.docx</code></td><td>Replaces placeholder tokens in your real Word document</td><td>Branded client reports</td></tr>
+    <tr><td><code>.md</code></td><td>AI follows your Markdown structure exactly</td><td>Consistent report structure</td></tr>
   </table>
-
+  </div>
   <h2>Placeholder Tokens</h2>
-  <p>Use these tokens in your template. VAJRA replaces them with real engagement data before passing the template to the AI:</p>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Token</th><th>Replaced with</th></tr>
     <tr><td><code>{{client}}</code></td><td>Client organisation name</td></tr>
-    <tr><td><code>{{tester}}</code></td><td>Lead assessor / author name</td></tr>
-    <tr><td><code>{{date}}</code></td><td>Report date (YYYY-MM-DD)</td></tr>
-    <tr><td><code>{{scope}}</code></td><td>In-scope targets / systems</td></tr>
-    <tr><td><code>{{target_system}}</code></td><td>Primary target system or application</td></tr>
-    <tr><td><code>{{assessment_team}}</code></td><td>Full assessment team names</td></tr>
-    <tr><td><code>{{tested_from}}</code></td><td>Testing perspective (External/Internal/etc.)</td></tr>
-    <tr><td><code>{{classification}}</code></td><td>Document classification label</td></tr>
-    <tr><td><code>{{report_version}}</code></td><td>Version string (e.g. 1.0 — Final)</td></tr>
+    <tr><td><code>{{tester}}</code></td><td>Lead assessor name</td></tr>
+    <tr><td><code>{{date}}</code></td><td>Report date</td></tr>
+    <tr><td><code>{{scope}}</code></td><td>In-scope targets</td></tr>
+    <tr><td><code>{{target_system}}</code></td><td>Primary target system</td></tr>
+    <tr><td><code>{{classification}}</code></td><td>Document classification</td></tr>
     <tr><td><code>{{engagement_ref}}</code></td><td>Engagement reference number</td></tr>
   </table>
-
-  <h2>Uploading a Template</h2>
-  <ol>
-    <li>Go to <strong>Settings → Templates</strong> in the VAJRA sidebar</li>
-    <li>Click <strong>Upload Template</strong> and select your <code>.docx</code> or <code>.md</code> file</li>
-    <li>The template appears in the <strong>Template</strong> dropdown on the report generation form</li>
-  </ol>
-
+  </div>
   <div class="callout callout-info">
-    <strong>Full guide:</strong> See <a href="https://github.com/Mah3Sec/VAJRA/blob/main/CUSTOM_TEMPLATE_GUIDE.md" target="_blank">CUSTOM_TEMPLATE_GUIDE.md</a> on GitHub for a complete worked example with a sample .docx template.
+    <strong>Full guide:</strong> See <a href="https://github.com/Mah3Sec/VAJRA/blob/main/CUSTOM_TEMPLATE_GUIDE.md" target="_blank">CUSTOM_TEMPLATE_GUIDE.md</a> on GitHub.
   </div>
 </div>
 
@@ -750,134 +774,82 @@ No X-Frame-Options, X-Content-Type-Options, or Content-Security-Policy headers.<
 <div class="page" id="p-export">
   <div class="pg-head">
     <div class="pg-title">Export &amp; PDF</div>
-    <div class="pg-sub">Export your generated report in DOCX, PDF, or Markdown format.</div>
+    <div class="pg-sub">Export reports as DOCX, PDF, or Markdown.</div>
   </div>
-
-  <h2>Export Formats</h2>
+  <div class="tbl-wrap">
   <table class="tbl">
-    <tr><th>Format</th><th>Output Quality</th><th>Requirement</th></tr>
-    <tr><td>DOCX</td><td>Professional styled Word document with cover page, logo, colour-coded severity</td><td>Works out of the box — no extra install</td></tr>
-    <tr><td>Markdown</td><td>Clean structured markdown — good for version control or further editing</td><td>Works out of the box</td></tr>
-    <tr><td>PDF via LibreOffice</td><td>Highest fidelity — converts the styled DOCX to PDF preserving all formatting</td><td><code>brew install --cask libreoffice</code></td></tr>
-    <tr><td>PDF via weasyprint</td><td>Good quality — converts markdown to styled HTML then PDF</td><td><code>pip3 install weasyprint markdown</code></td></tr>
-    <tr><td>PDF via pandoc</td><td>Standard quality — requires LaTeX or wkhtmltopdf</td><td><code>brew install pandoc</code></td></tr>
+    <tr><th>Format</th><th>Quality</th><th>Requirement</th></tr>
+    <tr><td>DOCX</td><td>Professional styled Word doc with cover page and logos</td><td>Works out of the box</td></tr>
+    <tr><td>Markdown</td><td>Clean structured markdown</td><td>Works out of the box</td></tr>
+    <tr><td>PDF via LibreOffice</td><td>Highest fidelity — preserves all DOCX formatting</td><td><code>brew install --cask libreoffice</code></td></tr>
+    <tr><td>PDF via weasyprint</td><td>Good quality HTML-to-PDF</td><td><code>pip3 install weasyprint markdown</code></td></tr>
   </table>
-
+  </div>
   <h2>Install PDF Export</h2>
-  <p>VAJRA tries all available PDF backends automatically in order: LibreOffice → pandoc+wkhtmltopdf → pandoc+LaTeX → weasyprint. Install any one and it will be used.</p>
-
-  <p>Recommended — easiest to install, works well:</p>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>pip3 install weasyprint markdown --break-system-packages</code></pre>
-
-  <p>Best quality output — converts the fully styled DOCX:</p>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>brew install --cask libreoffice    # macOS
-sudo apt install libreoffice       # Debian / Ubuntu</code></pre>
-
-  <h2>DOCX Cover Page</h2>
-  <p>The DOCX output includes a professionally styled cover page with:</p>
-  <ul>
-    <li>Your company logo (upload via Settings → Logos)</li>
-    <li>Your tester/firm logo</li>
-    <li>Report title, client name, date, classification, and version</li>
-    <li>Colour-coded report type theme (Pentest=navy, Red Team=crimson, Phishing=amber)</li>
-  </ul>
+sudo apt install libreoffice       # Linux</code></pre>
 </div>
 
 <!-- DEPLOYMENT -->
 <div class="page" id="p-deploy">
   <div class="pg-head">
     <div class="pg-title">Team Deployment</div>
-    <div class="pg-sub">Run VAJRA on a shared internal server so your whole team can access it.</div>
+    <div class="pg-sub">Run VAJRA on a shared internal server.</div>
   </div>
-
-  <h2>Docker (recommended)</h2>
-  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code># Build the image
-docker build -t vajra .
-
-# Run with persistent data volumes
-docker run -d \
-  --name vajra \
-  --restart unless-stopped \
-  -p 5000:5000 \
-  --env-file .env \
+  <h2>Docker</h2>
+  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>docker build -t vajra .
+docker run -d --name vajra --restart unless-stopped \
+  -p 5000:5000 --env-file .env \
   -v $(pwd)/reports:/app/reports \
   -v $(pwd)/database:/app/database \
-  -v $(pwd)/ui/static/logos:/app/ui/static/logos \
   vajra</code></pre>
-
-  <h2>nginx Reverse Proxy with HTTPS</h2>
-  <p>Put VAJRA behind nginx for HTTPS. The <code>proxy_read_timeout</code> is important — report generation can take 30–120 seconds for large assessments.</p>
+  <h2>nginx Reverse Proxy</h2>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>server {
     listen 443 ssl http2;
     server_name vajra.yourteam.com;
-
-    ssl_certificate     /path/to/cert.pem;
-    ssl_certificate_key /path/to/key.pem;
-
     location / {
         proxy_pass         http://127.0.0.1:5000;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
         proxy_read_timeout 300s;
-        proxy_send_timeout 300s;
     }
 }</code></pre>
-
-  <p>Set these in <code>.env</code> when behind HTTPS:</p>
+  <p>Set in <code>.env</code> when behind HTTPS:</p>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>HTTPS=true
 HOST=127.0.0.1
-PORT=5000
 SECRET_KEY=your-strong-random-key-here</code></pre>
-
   <h2>Backup</h2>
-  <p>All data lives in two directories. Back these up regularly:</p>
-  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code># Backup everything
-tar -czf vajra-backup-$(date +%Y%m%d).tar.gz database/ reports/
-
-# Restore
-tar -xzf vajra-backup-20260101.tar.gz</code></pre>
+  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>tar -czf vajra-backup-$(date +%Y%m%d).tar.gz database/ reports/</code></pre>
 </div>
 
 <!-- USERS -->
 <div class="page" id="p-users">
   <div class="pg-head">
     <div class="pg-title">User Management</div>
-    <div class="pg-sub">Multi-user access control with roles and per-report visibility settings.</div>
+    <div class="pg-sub">Multi-user access control with roles and per-report visibility.</div>
   </div>
-
-  <h2>Roles</h2>
+  <div class="tbl-wrap">
   <table class="tbl">
-    <tr><th>Role</th><th>Generate Reports</th><th>View Reports</th><th>Upload Files</th><th>Manage Users</th></tr>
-    <tr><td><strong>admin</strong></td><td>✅</td><td>All reports</td><td>✅</td><td>✅</td></tr>
+    <tr><th>Role</th><th>Generate</th><th>View Reports</th><th>Upload Files</th><th>Manage Users</th></tr>
+    <tr><td><strong>admin</strong></td><td>✅</td><td>All</td><td>✅</td><td>✅</td></tr>
     <tr><td><strong>analyst</strong></td><td>✅</td><td>Team + own</td><td>✅</td><td>❌</td></tr>
-    <tr><td><strong>viewer</strong></td><td>❌</td><td>Shared with them only</td><td>❌</td><td>❌</td></tr>
+    <tr><td><strong>viewer</strong></td><td>❌</td><td>Shared only</td><td>❌</td><td>❌</td></tr>
   </table>
-
-  <h2>Creating Users</h2>
-  <ol>
-    <li>Log in as admin</li>
-    <li>Go to <strong>Settings → Team</strong></li>
-    <li>Click <strong>Add User</strong> and fill in username, password, role, and display name</li>
-  </ol>
-
+  </div>
   <h2>Report Visibility</h2>
-  <p>Each report has a visibility setting controlled by its creator or an admin:</p>
+  <div class="tbl-wrap">
   <table class="tbl">
     <tr><th>Setting</th><th>Who can see it</th></tr>
-    <tr><td><strong>Private</strong></td><td>The creator and all admins</td></tr>
+    <tr><td><strong>Private</strong></td><td>Creator and all admins</td></tr>
     <tr><td><strong>Team</strong></td><td>All analysts and admins (default)</td></tr>
     <tr><td><strong>Public</strong></td><td>Everyone including viewers</td></tr>
   </table>
-  <p>You can also share a private report with specific users via the share button on any report.</p>
-
+  </div>
   <h2>Security Implementation</h2>
   <ul>
-    <li><strong>Password hashing:</strong> PBKDF2-HMAC-SHA256 with 260,000 iterations and a per-user random salt</li>
-    <li><strong>Brute-force protection:</strong> 10 failed attempts per IP address or username triggers a 5-minute lockout</li>
-    <li><strong>Session fixation:</strong> Session cleared before new login — prevents session fixation attacks</li>
-    <li><strong>Secure cookies:</strong> HttpOnly, SameSite=Strict, optional Secure flag when <code>HTTPS=true</code></li>
-    <li><strong>Rate limiting:</strong> Maximum 10 report generations per 5 minutes per user</li>
-    <li><strong>File upload limits:</strong> 50MB maximum upload size</li>
+    <li><strong>Password hashing:</strong> PBKDF2-HMAC-SHA256, 260,000 iterations, per-user salt</li>
+    <li><strong>Brute-force protection:</strong> 10 attempts per IP/username → 5-minute lockout</li>
+    <li><strong>Secure cookies:</strong> HttpOnly, SameSite=Strict, optional Secure flag</li>
+    <li><strong>Rate limiting:</strong> 10 report generations per 5 minutes per user</li>
   </ul>
 </div>
 
@@ -885,47 +857,24 @@ tar -xzf vajra-backup-20260101.tar.gz</code></pre>
 <div class="page" id="p-addprov">
   <div class="pg-head">
     <div class="pg-title">Adding a Provider</div>
-    <div class="pg-sub">Extend VAJRA with a new AI provider. Most take under 5 minutes to add.</div>
+    <div class="pg-sub">Extend VAJRA with a new AI provider in under 5 minutes.</div>
   </div>
-
-  <h2>Option A — OpenAI-compatible endpoint (1 line)</h2>
-  <p>Most modern AI APIs implement the OpenAI <code>/v1/chat/completions</code> wire format. If your provider does, just add its base URL to <code>_OPENAI_COMPAT_URLS</code> in <code>app.py</code>:</p>
-  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code># In app.py — find _OPENAI_COMPAT_URLS and add your provider:
-_OPENAI_COMPAT_URLS = {
-    "openai":      "https://api.openai.com/v1",
-    "grok":        "https://api.x.ai/v1",
+  <h2>Option A — OpenAI-compatible (1 line)</h2>
+  <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>_OPENAI_COMPAT_URLS = {
     # ... existing providers ...
-    "myprovider":  "https://api.myprovider.com/v1",   # ← add this line
+    "myprovider": "https://api.myprovider.com/v1",
 }</code></pre>
-  <p>Then set in <code>.env</code>:</p>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>AI_PROVIDER=myprovider
 AI_API_KEY=your-key
 AI_MODEL=their-model-name</code></pre>
-  <p>Done — no other code changes needed. VAJRA will route all API calls through your provider automatically.</p>
-
   <h2>Option B — Custom API format</h2>
-  <p>If your provider uses a unique request format (like Google Gemini), add an <code>elif</code> branch in the <code>_call_provider()</code> function in <code>app.py</code>:</p>
   <pre><button class="copy-btn" onclick="cp(this)">Copy</button><code>elif p == "myprovider":
-    # Import the provider's SDK
     import myprovider_sdk
     client = myprovider_sdk.Client(api_key=api_key)
-    response = client.generate(
-        model=model,
-        system=system_prompt,
-        prompt=user_prompt,
-        max_tokens=max_tokens,
-    )
+    response = client.generate(model=model, prompt=user_prompt)
     return response.text</code></pre>
-
-  <h2>Document your provider</h2>
-  <p>After adding a new provider, update these files so others can use it:</p>
-  <ul>
-    <li><code>.env.example</code> — add a commented configuration block</li>
-    <li><code>README.md</code> — add a row to the providers table</li>
-  </ul>
-
   <div class="callout callout-ok">
-    <strong>Contribute:</strong> Open a pull request on <a href="https://github.com/Mah3Sec/VAJRA" target="_blank">GitHub</a> to get your provider included in the next release.
+    <strong>Contribute:</strong> Open a pull request on <a href="https://github.com/Mah3Sec/VAJRA" target="_blank">GitHub</a> to include your provider in the next release.
   </div>
 </div>
 
@@ -933,17 +882,21 @@ AI_MODEL=their-model-name</code></pre>
 <div class="page" id="p-screenshots">
   <div class="pg-head">
     <div class="pg-title">Screenshots</div>
-    <div class="pg-sub">UI screenshots will be added here soon.</div>
+    <div class="pg-sub">UI screenshots coming soon.</div>
   </div>
+  <p style="font-size:13px;color:var(--t3);margin-bottom:8px;">Login Page</p>
+  <img src="screenshots/login.png" alt="VAJRA Login Page"
+    style="width:100%;border-radius:10px;border:1px solid var(--b2);margin:0 0 24px;display:block;">
 
-  <div class="ph"><div class="ph-icon">🔐</div><p>Login Page</p></div>
-  <div class="ph"><div class="ph-icon">📋</div><p>Dashboard — Report Generation Form</p></div>
+  <p style="font-size:13px;color:var(--t3);margin-bottom:8px;">Dashboard — Report Generation Form</p>
+  <img src="screenshots/dashboard.png" alt="VAJRA Dashboard"
+    style="width:100%;border-radius:10px;border:1px solid var(--b2);margin:0 0 24px;display:block;">
+
   <div class="ph"><div class="ph-icon">⚡</div><p>Report Generation Progress (chunked mode)</p></div>
   <div class="ph"><div class="ph-icon">📂</div><p>Report History &amp; Export</p></div>
   <div class="ph"><div class="ph-icon">📄</div><p>Generated DOCX Output</p></div>
-
   <div class="callout callout-info">
-    <strong>Contributing screenshots:</strong> Run VAJRA locally, capture the screens above, and open a pull request adding images to <code>docs/screenshots/</code> on <a href="https://github.com/Mah3Sec/VAJRA" target="_blank">GitHub</a>.
+    <strong>Contributing:</strong> Open a pull request adding images to <code>docs/screenshots/</code> on <a href="https://github.com/Mah3Sec/VAJRA" target="_blank">GitHub</a>.
   </div>
 </div>
 
@@ -953,58 +906,40 @@ AI_MODEL=their-model-name</code></pre>
     <div class="pg-title">Changelog</div>
     <div class="pg-sub">Version history for VAJRA.</div>
   </div>
-
   <h2>v1.4.0 — March 2026 · Public Release</h2>
-  <p>First public open-source release. Removed all proprietary integrations.</p>
   <ul>
-    <li>Multi-provider AI support — 14 providers with zero extra installs for 13 of them</li>
-    <li>Provider router rewritten using raw <code>httpx</code> — no SDK bloat for OpenAI-compatible providers</li>
+    <li>Multi-provider AI support — 14 providers, zero extra installs for 13</li>
+    <li>Provider router rewritten using raw <code>httpx</code> — no SDK bloat</li>
     <li><code>AI_PROVIDER</code>, <code>AI_API_KEY</code>, <code>AI_BASE_URL</code> replace all legacy env vars</li>
     <li>Full documentation site</li>
-    <li>Codebase cleaned and reorganised for public release</li>
   </ul>
-
   <h2>v1.3.0 — November 2025</h2>
   <ul>
-    <li>Parallel chunked generation engine for large assessments (10+ findings)</li>
-    <li>Real-time progress bar — polls <code>/api/generate/progress/&lt;job_id&gt;</code></li>
-    <li>Tool import parsers — Nessus <code>.nessus</code>, Burp Suite <code>.xml</code>, Nmap <code>.xml</code></li>
-    <li>Manual report generation without AI — direct to DOCX</li>
-    <li>Knowledge base smart selection — loads only relevant KB files per assessment type</li>
-    <li>XXE-safe XML parsing via <code>defusedxml</code></li>
+    <li>Parallel chunked generation engine for large assessments</li>
+    <li>Real-time progress bar via <code>/api/generate/progress/&lt;job_id&gt;</code></li>
+    <li>Tool import — Nessus, Burp Suite, Nmap XML parsers</li>
+    <li>Manual report generation without AI</li>
+    <li>Knowledge base smart selection per assessment type</li>
   </ul>
-
   <h2>v1.2.0 — September 2025</h2>
   <ul>
     <li>Multi-user system — admin, analyst, viewer roles</li>
-    <li>Per-report visibility (private / team / public) and explicit user sharing</li>
-    <li>Brute-force lockout — 10 attempts per IP/username, 5 minute window</li>
-    <li>PBKDF2-HMAC-SHA256 password hashing with 260,000 iterations and per-user salt</li>
-    <li>Session fixation protection — <code>session.clear()</code> on login</li>
-    <li>Rate limiting — 10 report generations per 5 minutes per user</li>
+    <li>Per-report visibility and explicit user sharing</li>
+    <li>Brute-force lockout and PBKDF2 password hashing</li>
+    <li>Rate limiting — 10 generations per 5 minutes per user</li>
   </ul>
-
   <h2>v1.1.0 — August 2025</h2>
   <ul>
-    <li>Red Team Engagement report type — CREST STAR / CBEST / TIBER-EU standard</li>
-    <li>Phishing Campaign report type — NIST / SANS / CREST standard with Resilience Score</li>
-    <li>Custom <code>.docx</code> template support — fills real Word templates with AI content</li>
-    <li>Custom <code>.md</code> template support — AI follows user-supplied structure exactly</li>
+    <li>Red Team and Phishing Campaign report types</li>
+    <li>Custom .docx and .md template support</li>
     <li>PDF export with multi-backend fallback chain</li>
-    <li>Logo embedding in DOCX cover page — company and tester logos</li>
-    <li><code>generate.js</code> v10 — complete DOCX builder rewrite fixing 12 identified issues</li>
+    <li>Logo embedding in DOCX cover page</li>
   </ul>
-
   <h2>v1.0.0 — June 2025</h2>
   <ul>
-    <li>Initial build — Flask web application on <code>localhost:5000</code></li>
-    <li>Penetration test report generation — CREST / PTES / OWASP WSTG v4.2 / NIST SP 800-115</li>
-    <li>Findings input via raw text paste</li>
-    <li>DOCX export via Node.js <code>docx</code> library</li>
-    <li>SQLite report history database</li>
-    <li>14 domain knowledge base files — web, AD, cloud, mobile, red team, phishing, network, wireless, API, OWASP Top 10, CWE, severity definitions, remediation boilerplate</li>
-    <li>Nessus, Burp Suite, and Nmap XML parsers</li>
-    <li>Single admin login with session-based authentication</li>
+    <li>Initial build — Flask on localhost:5000</li>
+    <li>Penetration test report generation</li>
+    <li>DOCX export, SQLite history, 14 knowledge base files</li>
   </ul>
 </div>
 
@@ -1022,6 +957,8 @@ function go(id, title) {
   document.getElementById('topTitle').textContent = title;
   document.querySelector('.content').scrollTo(0, 0);
   location.hash = id;
+  // Close sidebar on mobile after nav
+  closeSidebar();
 }
 
 function cp(btn) {
@@ -1033,9 +970,29 @@ function cp(btn) {
   });
 }
 
+// Mobile sidebar toggle
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('on');
+  document.body.style.overflow = sb.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  sb.classList.remove('open');
+  ov.classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+// Close on escape key
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
 // Hash routing on load
 const h = location.hash.replace('#','');
-const pages = {intro:true,install:true,quickstart:true,providers:true,env:true,reports:true,findings:true,templates:true,export:true,deploy:true,users:true,addprov:true,screenshots:true,changelog:true};
+const pages = {intro:1,install:1,quickstart:1,providers:1,env:1,reports:1,findings:1,templates:1,export:1,deploy:1,users:1,addprov:1,screenshots:1,changelog:1};
 if (h && pages[h]) {
   const n = document.querySelector(`[onclick*="go('${h}'"]`);
   if (n) n.click();
