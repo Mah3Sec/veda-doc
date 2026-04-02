@@ -107,8 +107,7 @@ body::before{
 /* Sidebar overlay for mobile */
 .sidebar-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.6);z-index:150;
-  backdrop-filter:blur(4px);
+  background:rgba(0,0,0,.65);z-index:155;
 }
 .sidebar-overlay.on{display:block;}
 
@@ -248,11 +247,12 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
     top:0;left:0;
     width:280px;max-width:85vw;
     height:100vh;
-    z-index:160;
+    z-index:170;
     transform:translateX(-100%);
     transition:transform .25s cubic-bezier(.4,0,.2,1);
     border-right:1px solid var(--b2);
-    box-shadow:8px 0 32px rgba(0,0,0,.4);
+    box-shadow:8px 0 32px rgba(0,0,0,.5);
+    /* No blur — sidebar stays crisp above the overlay */
   }
   .sidebar.open{transform:translateX(0);}
 
