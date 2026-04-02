@@ -106,8 +106,14 @@ body::before{
 
 /* Sidebar overlay for mobile */
 .sidebar-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.65);z-index:155;
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  z-index:155;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  cursor:pointer;
 }
 .sidebar-overlay.on{display:block;}
 
@@ -220,69 +226,91 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--s3);border:1px so
    RESPONSIVE — MOBILE & TABLET
 ═══════════════════════════════════════════ */
 
-/* Tablet — shrink sidebar */
+/* Tablet */
 @media(max-width:900px){
   :root{--sw:200px;}
   .topbar-links a:not(.gh){display:none;}
   .page{padding:24px 24px 60px;}
 }
 
-/* Mobile — full overlay sidebar */
+/* Mobile */
 @media(max-width:640px){
   :root{--th:48px;}
 
-  /* Switch to single column */
   .layout{grid-template-columns:1fr;grid-template-rows:var(--th) 1fr;}
 
-  /* Show hamburger, hide brand border */
   .menu-btn{display:flex;}
-  .brand{border-right:none;width:auto;padding:0 12px 0 4px;}
+  .brand{border-right:none;width:auto;padding:0 10px 0 0;}
   .brand-v{display:none;}
   .topbar-title{display:none;}
   .topbar-links .gh{font-size:11px;padding:4px 9px;}
 
-  /* Sidebar becomes a fixed overlay panel */
+  /* Sidebar: fixed overlay, slides in from left */
   .sidebar{
     position:fixed;
     top:0;left:0;
-    width:280px;max-width:85vw;
-    height:100vh;
+    width:280px;max-width:88vw;
+    height:100%;
+    min-height:100vh;
     z-index:170;
     transform:translateX(-100%);
-    transition:transform .25s cubic-bezier(.4,0,.2,1);
-    border-right:1px solid var(--b2);
-    box-shadow:8px 0 32px rgba(0,0,0,.5);
-    /* No blur — sidebar stays crisp above the overlay */
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+    border-right:1px solid var(--b3);
+    box-shadow:12px 0 40px rgba(0,0,0,.6);
+    background:var(--s1);
+    overflow-y:auto;
+    /* Force solid — no transparency, no blur bleed */
+    opacity:1 !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
   }
   .sidebar.open{transform:translateX(0);}
 
-  /* Content fills full width */
+  /* Nav items — full opacity always */
+  .nav-item{opacity:1 !important;color:var(--t2);}
+  .nav-item svg{opacity:0.75;}
+  .nav-item.active{color:var(--t1);}
+  .nav-item.active svg,.nav-item:hover svg{opacity:1;}
+
+  /* Content */
   .content{height:calc(100vh - var(--th));width:100%;}
   .page{padding:20px 16px 72px;max-width:100%;}
   .pg-title{font-size:18px;}
   .pg-sub{font-size:13px;}
 
-  /* Feature grid → single col on small screens */
+  /* Tables — scrollable horizontally on mobile */
+  .tbl-wrap{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    border-radius:8px;
+    border:1px solid var(--b2);
+    margin:10px 0 22px;
+  }
+  .tbl{min-width:480px;margin:0;}
+  .tbl th,.tbl td{padding:9px 12px;font-size:12px;}
+  /* Remove double border since wrap has one */
+  .tbl-wrap .tbl{border:none;}
+
+  /* Feature grid: single column */
   .fgrid{grid-template-columns:1fr;}
 
-  /* Code blocks — smaller font on mobile */
+  /* Code */
+  pre{padding:12px 14px;}
   pre code{font-size:11.5px;}
   code{font-size:11.5px;}
-
-  /* Copy button repositioning on mobile */
   .copy-btn{font-size:10px;padding:2px 8px;top:8px;right:8px;}
 
-  /* Steps — tighter on mobile */
+  /* Steps */
   .step{gap:10px;}
   .step-body h4{font-size:13px;}
 
   h2{font-size:14px;margin:24px 0 10px;}
 }
 
-/* Very small screens */
 @media(max-width:380px){
   .page{padding:16px 12px 64px;}
   .pg-title{font-size:16px;}
+  .tbl th,.tbl td{padding:8px 10px;font-size:11.5px;}
 }
 </style>
 </head>
